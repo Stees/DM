@@ -1,0 +1,35 @@
+#! /usr/bin/env python
+
+#takes an input file that contains xyz coordinates and charges corresponding to each position, and calculates the dipole moment
+import subprocess
+from collections import defaultdict
+import math as m
+
+xCoord = []
+yCoord = []
+zCoord = []
+charge = []
+momentx = []
+momenty = []
+momentz = []
+#determine the filename, read the data 
+getFilename = subprocess.Popen('ls *xyz', stdout=subprocess.PIPE, shell=True)
+filename = str(getFilename.communicate()[0].split()[0])
+dataFile = open(filename, 'r')
+lines = dataFile.readlines()
+#separate the data
+for line in lines:
+    xCoord.append(line.split()[1])
+    yCoord.append(line.split()[2])
+    zCoord.append(line.split()[3])
+    charge.append(line.split()[4])
+#calculate the dipole moment
+for x in range(0,len(lines)):
+    momentx.append(float(charge[x])*float(xCoord[x]))
+    momenty.append(float(charge[x])*float(yCoord[x]))
+    momentz.append(float(charge[x])*float(zCoord[x]))
+dipolex = sum(momentx)
+dipoley = sum(momenty)
+dipolez = sum(momentz)
+magnitude = m.sqrt(m.pow(dipolex,2) + m.pow(dipoley,2) + m.pow(dipolez,2))*float(1.60217662e-19)/float(1e10)/float(3.336e-30)
+print(u"Dipole moment: {0:.3f} D\n\nVector Components:\nx:\t{1:.3f} \u212B\ny:\t{2:.3f} \u212B\nz:\t{3:.3f} \u212B\n".encode('utf-8').format(magnitude,dipolex,dipoley,dipolez))
